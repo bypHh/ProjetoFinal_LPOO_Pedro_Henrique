@@ -32,7 +32,7 @@ Implementado com sucesso no domínio de prescrição de treinos através da clas
 
 Abaixo está o mapeamento visual das entidades do sistema, seus respectivos atributos, métodos e os relacionamentos de associação e dependência:
 
-![Diagrama de Classes do Sistema]
+**[Diagrama de Classes do Sistema]**
 
 <img width="944" height="623" alt="image" src="https://github.com/user-attachments/assets/7c82cee9-3a55-460d-bfd0-6211cdb7482d" />
 
