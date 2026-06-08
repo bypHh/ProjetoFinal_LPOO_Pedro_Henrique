@@ -1,0 +1,64 @@
+# FitManager Pro — Sistema de Gestão Integrada de Academia
+
+O **FitManager Pro** é uma aplicação desktop robusta desenvolvida em Python para a gestão operacional e técnica de academias de ginástica e centros fitness. O sistema foi projetado seguindo rigorosamente os princípios da **Orientação a Objetos (OO)** e o padrão de arquitetura em camadas **MVC (Model-View-DAO)**, garantindo modularidade, facilidade de manutenção e extensibilidade.
+
+A aplicação oferece um ecossistema completo para a administração de matrículas de alunos, vínculo com profissionais de educação física (instrutores) e prescrição dinâmica e automatizada de rotinas de treinamento por meio de padrões de projeto de software (Design Patterns).
+
+---
+
+## 🛠️ Tecnologias e Ambiente Técnico
+
+* **Linguagem de Programação:** Python 3.10+
+* **Interface Gráfica (GUI):** Tkinter & Ttk (Componentes com design customizado e responsivo)
+* **Banco de Dados Relacional:** PostgreSQL 14+
+* **Driver de Conectividade:** `psycopg2` (Operações e transações puras e seguras)
+* **Paradigma Principal:** Programação Orientada a Objetos (Herança, Encapsulamento, Polimorfismo e Abstração)
+
+---
+
+## 🏗️ Padrões de Projeto (Design Patterns) Implementados
+
+Para atender às exigências de arquitetura avançada de software, o sistema faz uso explícito de dois padrões de projeto:
+
+### 1. DAO (Data Access Object) — *Padrão de Persistência*
+Toda a lógica de manipulação e persistência de dados está completamente isolada da interface gráfica. As classes `AlunoDAO` e `TreinoDAO` abstraem os comandos SQL puros (`INSERT`, `SELECT`, `UPDATE`, `DELETE`), atuando como pontes exclusivas entre o banco de dados PostgreSQL e as regras de negócio das entidades. Isso impede o acoplamento e facilita a manutenção.
+
+### 2. Factory Method (Método Fábrica) — *Padrão Criacional*
+Implementado com sucesso no domínio de prescrição de treinos através da classe `TreinoFactory` (localizada em `model/treino.py`). A interface do sistema não instancia objetos da classe `Treino` diretamente. Em vez disso, ela delega essa responsabilidade para o método fábrica, que analisa a categoria de treino selecionada pelo usuário (**Hipertrofia**, **Cardio** ou **Geral**) e constrói dinamicamente o objeto com as descrições técnicas e diretrizes predefinidas.
+
+---
+
+## 📊 Diagrama de Classes UML
+
+Abaixo está o mapeamento visual das entidades do sistema, seus respectivos atributos, métodos e os relacionamentos de associação e dependência:
+
+![Diagrama de Classes do Sistema](diagrama.png)
+
+> 💡 **Nota de Execução:** Para que a imagem apareça acima, basta salvar o arquivo do seu diagrama gerado com o nome exato de `diagrama.png` na mesma pasta raiz onde este arquivo `README.md` está localizado e fazer o push para o GitHub.
+
+---
+
+## 📂 Estrutura Arquitetural do Projeto
+
+```text
+Sistema_Academia/
+│
+├── config/
+│   └── database.py        # Configurações de conexão e encoding com o PostgreSQL
+│
+├── model/
+│   ├── aluno.py           # Classe de domínio Aluno
+│   ├── instrutor.py       # Classe de domínio Instrutor
+│   └── treino.py          # Classe de domínio Treino + Fábrica Criacional
+│
+├── dao/
+│   ├── aluno_dao.py       # Persistência de dados e CRUD de alunos e instrutores
+│   └── treino_dao.py      # Persistência de dados e sub-rotinas de fichas técnicas
+│
+├── view/
+│   ├── main_window.py     # Janela Mestre (Controle de navegação superior e menus)
+│   ├── aluno_view.py      # Interface de gestão de Alunos, filtros e validações
+│   ├── instrutor_view.py  # Interface de gestão de Instrutores e registros CREF
+│   └── treino_view.py     # Interface de montagem automatizada via Factory Method
+│
+└── main.py                # Entry Point que inicializa a aplicação
