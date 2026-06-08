@@ -32,9 +32,9 @@ Implementado com sucesso no domínio de prescrição de treinos através da clas
 
 Abaixo está o mapeamento visual das entidades do sistema, seus respectivos atributos, métodos e os relacionamentos de associação e dependência:
 
-![Diagrama de Classes do Sistema](diagrama.png)
+![Diagrama de Classes do Sistema]
 
-> 💡 **Nota de Execução:** Para que a imagem apareça acima, basta salvar o arquivo do seu diagrama gerado com o nome exato de `diagrama.png` na mesma pasta raiz onde este arquivo `README.md` está localizado e fazer o push para o GitHub.
+<img width="944" height="623" alt="image" src="https://github.com/user-attachments/assets/7c82cee9-3a55-460d-bfd0-6211cdb7482d" />
 
 ---
 
