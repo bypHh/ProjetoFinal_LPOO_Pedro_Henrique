@@ -62,3 +62,14 @@ Sistema_Academia/
 │   └── treino_view.py     # Interface de montagem automatizada via Factory Method
 │
 └── main.py                # Entry Point que inicializa a aplicação
+
+```
+---
+
+## 🤖 Declaração de Uso de Inteligência Artificial e Autoria Assistida
+
+Em estrita conformidade com as diretrizes e critérios de integridade acadêmica estabelecidos para a Atividade Integradora Final da disciplina de LPOO, declara-se que este projeto foi **totalmente idealizado, estruturado e pilotado pelo desenvolvedor Pedro Henrique**, contando com o suporte assistido do modelo de inteligência artificial generativa (**Gemini 1.5 Pro**) atuando estritamente como copiloto técnico nas seguintes sub-rotinas:
+
+1. **Refatoração Estática da Interface:** Suporte na padronização visual dos componentes `ttk.Style` utilizando uma paleta de cores moderna (Modern Blue Layout).
+2. **Otimização de Algoritmos:** Auxílio na estruturação analítica dos loops de cálculo para validação matemática dos dígitos verificadores do CPF (recomendações da Receita Federal).
+3. **Resolução de Exceções de Ambiente:** Suporte na parametrização de encodings locais (`client_encoding="latin1"`) para evitar quebras de caractere e conflitos entre o driver `psycopg2` e o prompt de comando do Windows.
