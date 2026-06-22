@@ -1,145 +1,175 @@
 import tkinter as tk
-from tkinter import messagebox, ttk
-from config.database import Database
+from tkinter import ttk, messagebox
+from config.database import DatabaseConnection
 
-class InstrutorView(tk.Frame):
+class InstrutorView(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.instrutor_selecionado_id = None
-        
-        self.bg_color = "#f4f6f9"
-        self.primary_color = "#1e3d59"
-        self.accent_color = "#17b978"
-        self.danger_color = "#ff5e62"
-        
-        self.configure(bg=self.bg_color)
         self.criar_componentes()
         self.atualizar_tabela()
 
     def criar_componentes(self):
-        main_container = tk.Frame(self, bg=self.bg_color)
-        main_container.pack(fill="both", expand=True, padx=20, pady=15)
+        # Configuração de Grid Responsivo para a Tela
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
 
-        lbl_titulo = tk.Label(main_container, text="CADASTRO DE INSTRUTORES", font=("Arial", 14, "bold"), fg=self.primary_color, bg=self.bg_color)
-        lbl_titulo.grid(row=0, column=0, columnspan=2, pady=(0, 20))
+        # -------------------------------------------------------------------------
+        # PAINEL ESQUERDO: Formulário de Cadastro (Mesmo estilo do AlunoView)
+        # -------------------------------------------------------------------------
+        form_frame = ttk.LabelFrame(self, text=" Gestão de Instrutores ", padding=20)
+        form_frame.grid(row=0, column=0, padx=20, pady=20, sticky="ns")
 
-        form_frame = tk.Frame(main_container, bg=self.bg_color)
-        form_frame.grid(row=1, column=0, columnspan=2, sticky="ew")
-        form_frame.columnconfigure(1, weight=1)
+        # Campo Nome
+        ttk.Label(form_frame, text="Nome Completo: *", font=("Helvetica", 10, "bold")).pack(anchor=tk.W, pady=(0, 5))
+        self.txt_nome = ttk.Entry(form_frame, font=("Helvetica", 11), width=35)
+        self.txt_nome.pack(fill=tk.X, pady=(0, 15))
 
-        tk.Label(form_frame, text="Nome Completo:", font=("Arial", 10, "bold"), bg=self.bg_color).grid(row=0, column=0, sticky="w", pady=6)
-        self.txt_nome = tk.Entry(form_frame, font=("Arial", 10), bd=1, relief="solid")
-        self.txt_nome.grid(row=0, column=1, sticky="ew", pady=6, padx=(10, 0))
+        # Campo CREF
+        ttk.Label(form_frame, text="Registro CREF: *", font=("Helvetica", 10, "bold")).pack(anchor=tk.W, pady=(0, 5))
+        self.txt_cref = ttk.Entry(form_frame, font=("Helvetica", 11), width=35)
+        self.txt_cref.pack(fill=tk.X, pady=(0, 25))
 
-        tk.Label(form_frame, text="Inscricao CREF:", font=("Arial", 10, "bold"), bg=self.bg_color).grid(row=1, column=0, sticky="w", pady=6)
-        self.txt_cref = tk.Entry(form_frame, font=("Arial", 10), bd=1, relief="solid")
-        self.txt_cref.grid(row=1, column=1, sticky="ew", pady=6, padx=(10, 0))
+        # Container para os Botões de Ação (Estilo Bloco Uniforme)
+        btn_container = ttk.Frame(form_frame)
+        btn_container.pack(fill=tk.X, side=tk.BOTTOM, pady=(20, 0))
 
-        btn_frame = tk.Frame(main_container, bg=self.bg_color)
-        btn_frame.grid(row=2, column=0, columnspan=2, pady=20)
-        btn_style = {"font": ("Arial", 10, "bold"), "fg": "white", "bd": 0, "cursor": "hand2", "padx": 12, "pady": 6}
+        self.btn_salvar = ttk.Button(btn_container, text="➕ Salvar Novo", command=self.salvar, style="Accent.TButton")
+        self.btn_salvar.pack(fill=tk.X, pady=4)
 
-        tk.Button(btn_frame, text="Salvar Novo", bg=self.accent_color, command=self.salvar, **btn_style).pack(side="left", padx=5)
-        tk.Button(btn_frame, text="Atualizar", bg="#3a6073", command=self.atualizar, **btn_style).pack(side="left", padx=5)
-        tk.Button(btn_frame, text="Excluir", bg=self.danger_color, command=self.excluir, **btn_style).pack(side="left", padx=5)
-        tk.Button(btn_frame, text="Limpar", bg="#7f8c8d", command=self.limpar_campos, **btn_style).pack(side="left", padx=5)
+        self.btn_atualizar = ttk.Button(btn_container, text="🔄 Atualizar Cadastro", command=self.atualizar)
+        self.btn_atualizar.pack(fill=tk.X, pady=4)
 
-        separator = ttk.Separator(main_container, orient="horizontal")
-        separator.grid(row=3, column=0, columnspan=2, sticky="ew", pady=(0, 15))
+        self.btn_excluir = ttk.Button(btn_container, text="❌ Excluir Instrutor", command=self.excluir)
+        self.btn_excluir.pack(fill=tk.X, pady=4)
 
-        tabela_frame = tk.Frame(main_container)
-        tabela_frame.grid(row=4, column=0, columnspan=2, sticky="nsew")
-        main_container.rowconfigure(4, weight=1)
+        ttk.Separator(btn_container, orient="horizontal").pack(fill=tk.X, pady=10)
 
-        self.tree = ttk.Treeview(tabela_frame, columns=("ID", "Nome", "CREF"), show="headings", height=6)
-        self.tree.heading("ID", text="ID")
-        self.tree.heading("Nome", text="Nome do Profissional")
-        self.tree.heading("CREF", text="Nº de Registro CREF")
+        self.btn_limpar = ttk.Button(btn_container, text="🧹 Limpar Campos", command=self.limpar_campos)
+        self.btn_limpar.pack(fill=tk.X, pady=4)
+
+        # -------------------------------------------------------------------------
+        # PAINEL DIREITO: Listagem de Dados (Mesmo design com Scrollbar)
+        # -------------------------------------------------------------------------
+        list_frame = ttk.LabelFrame(self, text=" Instrutores Cadastrados ", padding=15)
+        list_frame.grid(row=0, column=1, padx=(0, 20), pady=20, sticky="nsew")
         
-        self.tree.column("ID", width=50, anchor="center")
-        self.tree.column("Nome", width=250, anchor="w")
-        self.tree.column("CREF", width=150, anchor="center")
+        list_frame.rowconfigure(0, weight=1)
+        list_frame.columnconfigure(0, weight=1)
+
+        colunas = ("id", "nome", "cref")
+        self.tree = ttk.Treeview(list_frame, columns=colunas, show="headings", selectmode="browse")
         
-        scrollbar = ttk.Scrollbar(tabela_frame, orient="vertical", command=self.tree.yview)
+        # Cabeçalhos
+        self.tree.heading("id", text="ID")
+        self.tree.heading("nome", text="Nome do Profissional")
+        self.tree.heading("cref", text="CREF")
+
+        # Alinhamentos e Larguras
+        self.tree.column("id", width=60, minwidth=50, anchor=tk.CENTER)
+        self.tree.column("nome", width=280, minwidth=200, anchor=tk.W)
+        self.tree.column("cref", width=140, minwidth=100, anchor=tk.CENTER)
+
+        # Scrollbar Integrada
+        scrollbar = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
-        self.tree.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-        
-        self.tree.bind("<<TreeviewSelect>>", self.carregar_selecionado)
 
+        self.tree.grid(row=0, column=0, sticky="nsew")
+        scrollbar.grid(row=0, column=1, sticky="ns")
+
+        # Evento de Clique na Linha da Tabela
+        self.tree.bind("<<TreeviewSelect>>", self.carregar_campos_selecionados)
+
+    # -------------------------------------------------------------------------
+    # MÉTODOS DE REGRA DE NEGÓCIO E PERSISTÊNCIA VIA SINGLETON
+    # -------------------------------------------------------------------------
     def salvar(self):
         nome, cref = self.txt_nome.get().strip(), self.txt_cref.get().strip()
         if not nome or not cref:
-            messagebox.showwarning("Validacao", "Nome e CREF sao obrigatorios!")
+            messagebox.showwarning("Validação", "Os campos Nome e CREF são obrigatórios!")
             return
 
         try:
-            conn = Database.get_connection()
+            conn = DatabaseConnection()
             cursor = conn.cursor()
             cursor.execute("INSERT INTO instrutor (nome, cref) VALUES (%s, %s)", (nome, cref))
             conn.commit()
             cursor.close()
-            conn.close()
-            messagebox.showinfo("Sucesso", "Instrutor cadastrado!")
+            messagebox.showinfo("Sucesso", "Instrutor cadastrado com sucesso!")
             self.limpar_campos()
             self.atualizar_tabela()
         except Exception as e:
-            messagebox.showerror("Erro", f"Erro: {e}")
+            messagebox.showerror("Erro", f"Erro ao salvar no banco: {e}")
 
     def atualizar(self):
-        if not self.instrutor_selecionado_id: return
+        if not self.instrutor_selecionado_id:
+            messagebox.showwarning("Seleção", "Selecione um instrutor na tabela para atualizar!")
+            return
+        
         nome, cref = self.txt_nome.get().strip(), self.txt_cref.get().strip()
+        if not nome or not cref:
+            messagebox.showwarning("Validação", "Os campos não podem ficar vazios!")
+            return
+
         try:
-            conn = Database.get_connection()
+            conn = DatabaseConnection()
             cursor = conn.cursor()
             cursor.execute("UPDATE instrutor SET nome=%s, cref=%s WHERE id=%s", (nome, cref, self.instrutor_selecionado_id))
             conn.commit()
             cursor.close()
-            conn.close()
-            messagebox.showinfo("Sucesso", "Cadastro atualizado!")
+            messagebox.showinfo("Sucesso", "Cadastro de instrutor atualizado!")
             self.limpar_campos()
             self.atualizar_tabela()
         except Exception as e:
-            messagebox.showerror("Erro", f"Erro: {e}")
+            messagebox.showerror("Erro", f"Erro ao atualizar: {e}")
 
     def excluir(self):
-        if not self.instrutor_selecionado_id: return
-        if messagebox.askyesno("Confirmar", "Remover este instrutor?"):
+        if not self.instrutor_selecionado_id:
+            messagebox.showwarning("Seleção", "Selecione um instrutor na tabela para excluir!")
+            return
+            
+        if messagebox.askyesno("Confirmar Exclusão", "Deseja realmente remover este instrutor?\n\nNota: Alunos vinculados a ele ficarão com a indicação de instrutor vazia."):
             try:
-                conn = Database.get_connection()
+                conn = DatabaseConnection()
                 cursor = conn.cursor()
                 cursor.execute("DELETE FROM instrutor WHERE id=%s", (self.instrutor_selecionado_id,))
                 conn.commit()
                 cursor.close()
-                conn.close()
+                messagebox.showinfo("Sucesso", "Instrutor removido do sistema!")
                 self.limpar_campos()
                 self.atualizar_tabela()
             except Exception as e:
-                messagebox.showerror("Erro", f"Erro: {e}")
+                messagebox.showerror("Erro", f"Erro ao excluir: {e}")
 
     def atualizar_tabela(self):
-        for item in self.tree.get_children(): self.tree.delete(item)
+        for item in self.tree.get_children():
+            self.tree.delete(item)
         try:
-            conn = Database.get_connection()
+            conn = DatabaseConnection()
             cursor = conn.cursor()
             cursor.execute("SELECT id, nome, cref FROM instrutor ORDER BY id")
-            for r in cursor.fetchall(): self.tree.insert("", "end", values=r)
+            for r in cursor.fetchall():
+                self.tree.insert("", "end", values=r)
             cursor.close()
-            conn.close()
         except Exception as e:
-            print(f"Erro listar: {e}")
+            print(f"Erro ao atualizar tabela de instrutores: {e}")
 
-    def carregar_selecionado(self, event):
-        item = self.tree.selection()
-        if item:
-            valores = self.tree.item(item, "values")
-            self.instrutor_selecionado_id = valores[0]
-            self.txt_nome.delete(0, tk.END)
-            self.txt_nome.insert(0, valores[1])
-            self.txt_cref.delete(0, tk.END)
-            self.txt_cref.insert(0, valores[2])
+    def carregar_campos_selecionados(self, event):
+        item_selecionado = self.tree.selection()
+        if not item_selecionado:
+            return
+            
+        valores = self.tree.item(item_selecionado[0], "values")
+        self.instrutor_selecionado_id = valores[0]
+        
+        self.txt_nome.delete(0, tk.END)
+        self.txt_nome.insert(0, valores[1])
+        
+        self.txt_cref.delete(0, tk.END)
+        self.txt_cref.insert(0, valores[2])
 
     def limpar_campos(self):
         self.instrutor_selecionado_id = None
         self.txt_nome.delete(0, tk.END)
         self.txt_cref.delete(0, tk.END)
+        self.tree.selection_remove(self.tree.selection())

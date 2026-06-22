@@ -26,6 +26,9 @@ Toda a lógica de manipulação e persistência de dados está completamente iso
 ### 2. Factory Method (Método Fábrica) — *Padrão Criacional*
 Implementado com sucesso no domínio de prescrição de treinos através da classe `TreinoFactory` (localizada em `model/treino.py`). A interface do sistema não instancia objetos da classe `Treino` diretamente. Em vez disso, ela delega essa responsabilidade para o método fábrica, que analisa a categoria de treino selecionada pelo usuário (**Hipertrofia**, **Cardio** ou **Geral**) e constrói dinamicamente o objeto com as descrições técnicas e diretrizes predefinidas.
 
+### 3. Singleton — *Padrão Criacional de Instância Única*
+Implementado na classe `DatabaseConnection` (`config/database.py`). Esse padrão restringe a instanciação da conexão com o PostgreSQL a um único objeto compartilhado por toda a aplicação. Evita o desperdício de memória e a sobrecarga do servidor que ocorreriam caso cada componente visual ou classe DAO tentasse abrir uma nova conexão simultânea com o banco de dados.
+
 ---
 
 ## 📊 Diagrama de Classes UML
